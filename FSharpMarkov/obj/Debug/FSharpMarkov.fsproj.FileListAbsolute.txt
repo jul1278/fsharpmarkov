@@ -6,3 +6,11 @@ D:\Git\FSharpMarkov\FSharpMarkov\bin\Debug\FSharp.Core.dll
 D:\Git\FSharpMarkov\FSharpMarkov\bin\Debug\FSharp.Core.xml
 D:\Git\FSharpMarkov\FSharpMarkov\obj\Debug\FSharpMarkov.exe
 D:\Git\FSharpMarkov\FSharpMarkov\obj\Debug\FSharpMarkov.pdb
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharpMarkov.exe.config
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharpMarkov.XML
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharpMarkov.exe
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharpMarkov.pdb
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Core.dll
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Core.xml
+C:\Projects\fsharpmarkov\FSharpMarkov\obj\Debug\FSharpMarkov.exe
+C:\Projects\fsharpmarkov\FSharpMarkov\obj\Debug\FSharpMarkov.pdb

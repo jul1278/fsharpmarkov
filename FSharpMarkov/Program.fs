@@ -3,23 +3,16 @@
 
 open System
 open System.IO
-
-let punctuation = [",";"\"";"'";";";"."]
+open System.Text.RegularExpressions
 
 let lines = 
-    File.ReadLines("C:\\book.txt") 
-        |> Seq.toList
+    File.ReadLines("C:\\Projects\\fsharpmarkov\\text.txt") 
+        |> Seq.toList 
+        //|> Seq.map(fun w -> Regex.Replace(w, "[,.?()]", ""))  
+        //|> Seq.map(fun w -> w.ToLower())  
         |> Seq.fold(fun acc a -> String.Format("{0}{1}", acc, a)) "" 
-
-let words = 
-    lines.Split([|' '|]) 
-    |> Seq.filter(fun c -> (List.exists ((=) c) punctuation) = false) // remove punctuation
-    |> Seq.toList
-
-let wordFreq wordLst = 
-    wordLst |> Seq.groupBy(fun x -> x)
-            |> Seq.map(fun (word, sq) -> word, Seq.length sq)
-            |> Seq.toList
+     
+let words = lines.Split([|' '|]) |> Seq.toList
 
 let numWordIsNext word nextWord wordLst = 
     wordLst 
@@ -27,45 +20,66 @@ let numWordIsNext word nextWord wordLst =
     |> Seq.filter(fun w -> (Seq.head w) = word && (Seq.last w) = nextWord) 
     |> Seq.length
 
-let numOccurences word wordLst = 
+let wordsFollowingWord word wordLst = 
     wordLst
-    |> Seq.filter(fun w -> w = word)
-    |> Seq.length
+    |> Seq.windowed 2
+    |> Seq.filter(fun w -> (Seq.head w) = word)
+    |> Seq.map(fun w -> (Seq.last w))
+    |> Seq.toList
 
-let prob word nextWord wordLst = ((numWordIsNext word nextWord wordLst) |> float) / ((numOccurences word wordLst) |> float)
+let uniqueWords wordLst = 
+    wordLst 
+    |> Seq.distinct 
+    |> Seq.toList
 
-let allPairs (uniqueWords : List<String>) = 
-    [for word1 in uniqueWords do 
-        for word2 in uniqueWords do yield (word1, word2)]
+let occurencesOfEachWordAfterWord currWord wordLst = 
+    [for word in uniqueWords wordLst do
+        yield (word, numWordIsNext currWord word wordLst) ]  
+    |> Seq.filter(fun a -> match a with | (_, 0) -> false | _ -> true)  
+    |> Seq.toList
 
-let uniqueWords wordLst = wordLst |> Seq.distinct |> Seq.toList
+let normalized (numOccurences : List<String * int>) = 
+     let largest= numOccurences |> Seq.fold(fun acc a -> acc + (snd a)) 0 |> Convert.ToDouble
+     [for pair in numOccurences do 
+        let word = fst pair
+        let norm = (Convert.ToDouble(snd pair)) / largest
+        yield (word, norm)]
+        
+let markovChainNorm wordLst = 
+    [for word in uniqueWords wordLst do
+        let numOccurences = occurencesOfEachWordAfterWord word wordLst
+        let normNumOccurences = normalized numOccurences 
+        yield (word, normNumOccurences)]
 
-let allPairsProb wordLst =
-    let uniqueWords = uniqueWords wordLst
-    [for word1 in uniqueWords do 
-        for word2 in uniqueWords do 
-            let p = prob word1 word2 wordLst
-            yield (word1, word2, p)] |> Seq.filter(fun t -> match t with | (_, _, 0.0) -> false | _ -> true)
+let markovChain wordLst = 
+    [for word in uniqueWords wordLst do
+        let wordsFollowing = wordsFollowingWord word wordLst
+        yield (word, wordsFollowing)]
+  
+let pickNextWord words =
+    let rand = Random()
+    let r = rand.NextDouble()*Convert.ToDouble(List.length words)
+    let index = Convert.ToInt32(Math.Floor(r)) 
+    match List.length words with
+    | 0 -> ""
+    | _ -> List.nth words index 
+    
+                
+let rec printWords (chain : List<string * List<string>>) word counter = 
+    if counter = 0 then " "
+    else
+        let words = snd (List.find(fun w -> if (fst w) = word then true else false) chain)
+        let nextWord = pickNextWord words
+        word + " " + printWords chain nextWord (counter - 1)
 
 [<EntryPoint>]
 let main argv = 
+    let chain = markovChain words
+    let seed = List.head( chain |> Seq.map(fun w -> fst w) |> Seq.toList)
+    let text = printWords chain seed 100
+    Console.Write(text)
+    let a = Console.ReadLine()
 
-    let result1 = numWordIsNext "cat" "dog" ["cat";"dog";"cat";"cow"]
-    let result2 = numWordIsNext "cat" "dog" ["cat";"dog";"cat";"cow";"cat";"dog";]
-
-    let c = numOccurences "cat" ["cat";"dog";"cat";"cow";"cat";"dog";]
-    let prob1 = prob "cat" "dog" ["cat";"dog";"cat";"cow"]
-
-    let pairs = allPairsProb (uniqueWords words)
-
-    for p in pairs do
-        printfn "%s %s %f" <||| p 
-
-//    for pair in pairs do  
-//        let p = prob (fst pair) (snd pair) words
-//
-//        if p > 0.0 then
-//            printfn "%s %s %f" <||| (fst pair, snd pair, p)  
     0
 
 
