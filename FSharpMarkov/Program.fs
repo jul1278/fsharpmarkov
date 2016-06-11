@@ -7,7 +7,13 @@ open System.Text.RegularExpressions
 
 let lines = 
     File.ReadLines("C:\\Projects\\fsharpmarkov\\text.txt") 
+        |> Seq.map(fun l -> l + "\n")
         |> Seq.toList 
+        |> Seq.map(fun w -> Regex.Replace(w, "[a-z]\.[a-z]", ". "))
+        |> Seq.map(fun w -> Regex.Replace(w, "[)]", ") "))
+        |> Seq.map(fun w -> Regex.Replace(w, "[\\t\\n\\r]+"," "))
+        |> Seq.map(fun w -> Regex.Replace(w, "[>]", "\n>"))
+        |> Seq.map(fun w -> Regex.Replace(w, "[?]", "\n"))        
         //|> Seq.map(fun w -> Regex.Replace(w, "[,.?()]", ""))  
         //|> Seq.map(fun w -> w.ToLower())  
         |> Seq.fold(fun acc a -> String.Format("{0}{1}", acc, a)) "" 
@@ -25,11 +31,13 @@ let wordsFollowingWord word wordLst =
     |> Seq.windowed 2
     |> Seq.filter(fun w -> (Seq.head w) = word)
     |> Seq.map(fun w -> (Seq.last w))
+    |> Seq.distinct
     |> Seq.toList
 
 let uniqueWords wordLst = 
     wordLst 
     |> Seq.distinct 
+    |> Seq.filter(fun w -> (String.IsNullOrEmpty w) = false)
     |> Seq.toList
 
 let occurencesOfEachWordAfterWord currWord wordLst = 
@@ -68,15 +76,16 @@ let pickNextWord words =
 let rec printWords (chain : List<string * List<string>>) word counter = 
     if counter = 0 then " "
     else
-        let words = snd (List.find(fun w -> if (fst w) = word then true else false) chain)
-        let nextWord = pickNextWord words
-        word + " " + printWords chain nextWord (counter - 1)
+        let wordOrNone = List.tryFind(fun w -> if (fst w) = word then true else false) chain
+        match wordOrNone with
+        | None -> " "
+        | _ -> word + " " + printWords chain (pickNextWord (snd (Option.get wordOrNone))) (counter - 1)
 
 [<EntryPoint>]
 let main argv = 
     let chain = markovChain words
-    let seed = List.head( chain |> Seq.map(fun w -> fst w) |> Seq.toList)
-    let text = printWords chain seed 100
+    let seed = pickNextWord ( chain |> Seq.map(fun w -> fst w) |> Seq.toList)
+    let text = printWords chain seed 40
     Console.Write(text)
     let a = Console.ReadLine()
 
