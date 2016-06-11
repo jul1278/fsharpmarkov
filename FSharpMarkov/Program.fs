@@ -31,7 +31,7 @@ let wordsFollowingWord word wordLst =
     |> Seq.windowed 2
     |> Seq.filter(fun w -> (Seq.head w) = word)
     |> Seq.map(fun w -> (Seq.last w))
-    |> Seq.distinct
+    //|> Seq.distinct
     |> Seq.toList
 
 let uniqueWords wordLst = 
@@ -66,8 +66,8 @@ let markovChain wordLst =
   
 let pickNextWord words =
     let rand = Random()
-    let r = rand.NextDouble()*Convert.ToDouble(List.length words)
-    let index = Convert.ToInt32(Math.Floor(r)) 
+    let r = rand.NextDouble()*Convert.ToDouble((List.length words) - 1)
+    let index = Convert.ToInt32(Math.Round(r)) 
     match List.length words with
     | 0 -> ""
     | _ -> List.nth words index 
@@ -81,14 +81,22 @@ let rec printWords (chain : List<string * List<string>>) word counter =
         | None -> " "
         | _ -> word + " " + printWords chain (pickNextWord (snd (Option.get wordOrNone))) (counter - 1)
 
+let rec generateNew (chain : List<string * List<string>>) = 
+    let seed = pickNextWord ( chain |> Seq.map(fun w -> fst w) |> Seq.toList)
+    let text = printWords chain seed 40
+    Console.WriteLine(text)
+    let a = Console.ReadLine()
+    generateNew chain
+
 [<EntryPoint>]
 let main argv = 
     let chain = markovChain words
-    let seed = pickNextWord ( chain |> Seq.map(fun w -> fst w) |> Seq.toList)
-    let text = printWords chain seed 40
-    Console.Write(text)
-    let a = Console.ReadLine()
-
+//    let seed = pickNextWord ( chain |> Seq.map(fun w -> fst w) |> Seq.toList)
+//    let text = printWords chain seed 40
+//    Console.WriteLine(text)
+//    
+//    let a = Console.ReadLine()
+    generateNew chain
     0
 
 
