@@ -14,3 +14,8 @@ C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Core.dll
 C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Core.xml
 C:\Projects\fsharpmarkov\FSharpMarkov\obj\Debug\FSharpMarkov.exe
 C:\Projects\fsharpmarkov\FSharpMarkov\obj\Debug\FSharpMarkov.pdb
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Data.dll
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Data.Toolbox.Twitter.dll
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Data.pdb
+C:\Projects\fsharpmarkov\FSharpMarkov\bin\Debug\FSharp.Data.xml
+C:\Projects\fsharpmarkov\FSharpMarkov\obj\Debug\FSharpMarkov.fsprojResolveAssemblyReference.cache
