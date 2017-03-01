@@ -94,7 +94,7 @@ let rec doTweet (twitter : FSharp.Data.Toolbox.Twitter.Twitter) textChain =
 [<System.STAThread>]
 let main argv = 
 
-    let text = readLines "C:\\Projects\\fsharpmarkov\\vote_hillary.txt"
+    let text = readLines "C:\\Projects\\fsharpmarkov\\source_text.txt"
     let textChain = markovChain text
 
     // store it as a list so we don't query tweets twice
